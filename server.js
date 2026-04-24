@@ -6,9 +6,9 @@ dotenv.config();
 
 const app = express();
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3002;
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || "google/gemini-2.0-flash-001";
+const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || "google/gemini-2.5-flash-lite-preview-09-2025";
 const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || "http://localhost:5173";
 const SITE_URL = process.env.SITE_URL || FRONTEND_ORIGIN;
 const SITE_TITLE = process.env.SITE_TITLE || "AI Family Law Consultant";
