@@ -8,7 +8,8 @@ const app = express();
 
 const PORT = process.env.PORT || 3002;
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || "google/gemini-2.5-flash-lite-preview-09-2025";
+const OPENROUTER_MODEL =
+  process.env.OPENROUTER_MODEL || "google/gemini-2.5-flash-lite-preview-09-2025";
 const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || "http://localhost:5173";
 const SITE_URL = process.env.SITE_URL || FRONTEND_ORIGIN;
 const SITE_TITLE = process.env.SITE_TITLE || "AI Family Law Consultant";
@@ -21,27 +22,31 @@ app.use(
   cors({
     origin: FRONTEND_ORIGIN.split(",").map((origin) => origin.trim()),
     methods: ["GET", "POST", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"]
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
 app.use(express.json({ limit: "3mb" }));
 
-async function callOpenRouter({ prompt, responseFormat }) {
+async function callOpenRouter({ prompt, responseFormat = "text" }) {
   const body = {
-    model: OPENROUTER_MODEL,
+    model: "openrouter/auto",
+    extra_body: {
+      route: "fallback",
+      models: [
+        OPENROUTER_MODEL,
+        "anthropic/claude-3-haiku"
+      ],
+    },
     messages: [
       {
         role: "user",
-        content: prompt
-      }
+        content: prompt,
+      },
     ],
-    temperature: 0.2
+    response_format:
+      responseFormat === "json" ? { type: "json_object" } : undefined,
   };
-
-  if (responseFormat === "json") {
-    body.response_format = { type: "json_object" };
-  }
 
   const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
@@ -49,9 +54,9 @@ async function callOpenRouter({ prompt, responseFormat }) {
       Authorization: `Bearer ${OPENROUTER_API_KEY}`,
       "Content-Type": "application/json",
       "HTTP-Referer": SITE_URL,
-      "X-Title": SITE_TITLE
+      "X-Title": SITE_TITLE,
     },
-    body: JSON.stringify(body)
+    body: JSON.stringify(body),
   });
 
   const raw = await response.text();
@@ -72,7 +77,7 @@ async function callOpenRouter({ prompt, responseFormat }) {
   return {
     text,
     usage: data.usage || null,
-    model: data.model || OPENROUTER_MODEL
+    model: data.model || OPENROUTER_MODEL,
   };
 }
 
@@ -82,21 +87,22 @@ app.post("/api/llm", async (req, res) => {
 
     if (!prompt || typeof prompt !== "string") {
       return res.status(400).json({
-        error: "prompt is required and must be a string"
+        error: "prompt is required and must be a string",
       });
     }
 
     const result = await callOpenRouter({
       prompt,
-      responseFormat
+      responseFormat,
     });
 
     return res.json(result);
   } catch (error) {
     console.error("[/api/llm] error:", error);
+
     return res.status(500).json({
       error: "LLM request failed",
-      message: error instanceof Error ? error.message : "Unknown error"
+      message: error instanceof Error ? error.message : "Unknown error",
     });
   }
 });
@@ -104,7 +110,7 @@ app.post("/api/llm", async (req, res) => {
 app.get("/api/health", (_req, res) => {
   res.json({
     ok: true,
-    model: OPENROUTER_MODEL
+    model: OPENROUTER_MODEL,
   });
 });
 
