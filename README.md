@@ -1,11 +1,68 @@
-# Family Law AI Backend
+# ⚙️ AI-консультант — Backend API
 
-Минимальный backend для MVP AI-консультанта по семейному праву.
+Backend-сервис для безопасного взаимодействия с LLM (OpenRouter).
 
-Фронт не должен вызывать OpenRouter напрямую.  
-Фронт вызывает этот backend, а backend хранит `OPENROUTER_API_KEY` в переменных окружения.
+---
 
-## Локальный запуск
+## 🚀 Назначение
+
+Backend отвечает за:
+
+* хранение API ключа
+* обработку запросов от фронтенда
+* отправку запросов в OpenRouter
+* возврат результата
+
+---
+
+## 🧠 Архитектура
+
+Frontend → Backend → OpenRouter
+
+---
+
+## 📡 API
+## Endpoint
+
+### POST `/api/llm`
+
+#### Request
+
+```json
+{
+  "prompt": "Текст запроса",
+  "responseFormat": "json"
+}
+```
+
+#### Response
+
+```json
+{
+  "text": "...",
+  "usage": {},
+  "model": "..."
+}
+```
+
+---
+
+## ⚙️ Переменные окружения
+
+```env
+PORT=3002
+OPENROUTER_API_KEY=...
+OPENROUTER_MODEL=google/gemini-2.5-flash-lite-preview-09-2025
+FRONTEND_ORIGIN=https://annaartyakusheva-ai-family-law-consultant-229c.twc1.net
+SITE_URL=https://annaartyakusheva-ai-family-law-consultant-229c.twc1.net/
+SITE_TITLE=AI Family Law Consultant
+```
+
+---
+
+## 🛠 Запуск
+
+## Локально
 
 ```bash
 cd backend
@@ -28,36 +85,33 @@ curl -X POST http://localhost:3002/api/llm \
   -d '{"prompt":"Верни JSON { \"ok\": true }","responseFormat":"json"}'
 ```
 
-## Переменные окружения
+---
 
-```env
-PORT=3002
-OPENROUTER_API_KEY=...
-OPENROUTER_MODEL=google/gemini-2.5-flash-lite-preview-09-2025
-FRONTEND_ORIGIN=https://annaartyakusheva-ai-family-law-consultant-229c.twc1.net
-SITE_URL=https://annaartyakusheva-ai-family-law-consultant-229c.twc1.net/
-SITE_TITLE=AI Family Law Consultant
+### Docker
+
+```bash
+docker build -t ai-backend .
+docker run -p 3002:3002 --env-file .env ai-backend
 ```
 
-## Endpoint
+---
 
-### POST /api/llm
+## 🔐 Безопасность
 
-Request:
+* API ключ не передается во frontend
+* все LLM-запросы идут через backend
+* используется CORS
 
-```json
-{
-  "prompt": "Текст промпта",
-  "responseFormat": "json"
-}
-```
+---
 
-Response:
+## ⚠️ Важно
 
-```json
-{
-  "text": "...",
-  "usage": null,
-  "model": "..."
-}
-```
+* не коммитить `.env`
+* ограничить `FRONTEND_ORIGIN`
+* контролировать лимиты API
+
+---
+
+## 📌 Статус
+
+MVP (в разработке)
