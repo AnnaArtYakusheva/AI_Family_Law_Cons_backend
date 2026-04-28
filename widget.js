@@ -2,7 +2,6 @@
   const BACKEND_URL = "https://annaartyakusheva-ai-family-law-cons-backend-5045.twc1.net";
   const FULL_CONSULTANT_URL = "https://annaartyakusheva-ai-family-law-consultant-229c.twc1.net";
 
-  // --- кнопка ---
   const button = document.createElement("div");
   button.innerHTML = "💬";
 
@@ -25,15 +24,14 @@
 
   document.body.appendChild(button);
 
-  // --- окно чата ---
   const chat = document.createElement("div");
 
   Object.assign(chat.style, {
     position: "fixed",
     bottom: "90px",
     right: "20px",
-    width: "320px",
-    height: "430px",
+    width: "340px",
+    height: "440px",
     background: "#fff",
     borderRadius: "12px",
     boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
@@ -78,7 +76,6 @@
 
   document.body.appendChild(chat);
 
-  // --- логика открытия ---
   button.onclick = () => {
     chat.style.display = chat.style.display === "none" ? "flex" : "none";
   };
@@ -87,22 +84,19 @@
   const input = chat.querySelector("#input");
   const send = chat.querySelector("#send");
 
-  addMessage(
-    "Здравствуйте! Это демонстрация AI-агента по семейному праву РФ. Для полноценного разбора откройте полный AI-консультант.",
-    false
-  );
+  let typingDiv;
 
   function addMessage(text, isUser) {
     const div = document.createElement("div");
 
-    div.textContent = text;
+    div.textContent = text.length > 500 ? text.slice(0, 500) + "..." : text;
 
     Object.assign(div.style, {
       marginBottom: "8px",
       padding: "8px 10px",
       borderRadius: "10px",
       maxWidth: "85%",
-      fontSize: "14px",
+      fontSize: "13px",
       lineHeight: "1.4",
       color: isUser ? "#fff" : "#111827",
       background: isUser ? "#2563eb" : "#f1f5f9",
@@ -114,12 +108,35 @@
     messages.scrollTop = messages.scrollHeight;
   }
 
+  function showTyping() {
+    typingDiv = document.createElement("div");
+    typingDiv.textContent = "Печатает...";
+
+    Object.assign(typingDiv.style, {
+      fontSize: "12px",
+      color: "#64748b",
+      marginBottom: "6px",
+    });
+
+    messages.appendChild(typingDiv);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  function hideTyping() {
+    if (typingDiv) {
+      typingDiv.remove();
+      typingDiv = null;
+    }
+  }
+
   async function sendMessage() {
     const text = input.value.trim();
     if (!text) return;
 
     addMessage(text, true);
     input.value = "";
+
+    showTyping();
 
     try {
       const res = await fetch(`${BACKEND_URL}/api/llm`, {
@@ -128,13 +145,16 @@
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          prompt: `Отвечай только на русском языке. Ты AI-консультант по семейному праву РФ. Дай краткий справочный ответ и предложи открыть полный AI-консультант для более точного разбора. Вопрос пользователя: ${text}`,
+          prompt: `Отвечай только на русском языке. Отвечай кратко, до 5 предложений. Ты демонстрационный AI-агент по семейному праву РФ. В конце мягко предложи открыть полный AI-консультант для более точного разбора. Вопрос пользователя: ${text}`,
         }),
       });
 
       const data = await res.json();
+
+      hideTyping();
       addMessage(data.text || "Ошибка ответа", false);
     } catch (e) {
+      hideTyping();
       addMessage("Ошибка соединения", false);
     }
   }
@@ -144,4 +164,9 @@
   input.addEventListener("keypress", (e) => {
     if (e.key === "Enter") sendMessage();
   });
+
+  addMessage(
+    "Здравствуйте! Это демо AI-агента по семейному праву РФ. Для полноценного разбора откройте полный AI-консультант.",
+    false
+  );
 })();
