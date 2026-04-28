@@ -45,8 +45,8 @@
     </div>
     <div id="messages" style="flex:1;padding:10px;overflow:auto;"></div>
     <div style="display:flex;border-top:1px solid #eee;">
-      <input id="input" style="flex:1;padding:10px;border:none;outline:none;" placeholder="Ваш вопрос..." />
-      <button id="send" style="padding:10px;">➤</button>
+      <input id="input" style="flex:1;padding:10px;border:none;outline:none;color:#111827;background:#fff;" placeholder="Ваш вопрос..." />
+      <button id="send" style="padding:10px 14px;border:none;background:#2563eb;color:#fff;cursor:pointer;">➤</button>
     </div>
   `;
 
@@ -61,11 +61,22 @@
   const input = chat.querySelector("#input");
   const send = chat.querySelector("#send");
 
+  addMessage("Здравствуйте! Опишите вашу ситуацию по семейному праву, и я подскажу, какие вопросы стоит обсудить с юристом.", false);
+
   function addMessage(text, isUser) {
     const div = document.createElement("div");
     div.textContent = text;
     div.style.marginBottom = "8px";
-    div.style.textAlign = isUser ? "right" : "left";
+    div.style.padding = "8px 10px";
+    div.style.borderRadius = "10px";
+    div.style.maxWidth = "85%";
+    div.style.fontSize = "14px";
+    div.style.lineHeight = "1.4";
+    div.style.color = isUser ? "#fff" : "#111827";
+    div.style.background = isUser ? "#2563eb" : "#f1f5f9";
+    div.style.marginLeft = isUser ? "auto" : "0";
+    div.style.marginRight = isUser ? "0" : "auto";
+
     messages.appendChild(div);
     messages.scrollTop = messages.scrollHeight;
   }
