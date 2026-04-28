@@ -28,6 +28,8 @@ app.use(
 
 app.use(express.json({ limit: "3mb" }));
 
+app.use(express.static("."));
+
 async function callOpenRouter({ prompt, responseFormat = "text" }) {
   const body = {
     model: "openrouter/auto",
