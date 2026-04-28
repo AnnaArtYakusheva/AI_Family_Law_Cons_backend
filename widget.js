@@ -95,7 +95,7 @@
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          prompt: text,
+          prompt: `Отвечай только на русском языке. Ты AI-консультант по семейному праву РФ. Вопрос пользователя: ${text}`,
         }),
       });
 
